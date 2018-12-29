@@ -81,23 +81,23 @@ define i8* @substr(i8* %str, i32 %offset, i32 %length) {
 
 @AF_INET = constant i32 2
 
-; typedef __uint8_t		sa_family_t;
-; typedef	__uint16_t		in_port_t;
-; typedef	__uint32_t	in_addr_t;
+; typedef __uint8_t    sa_family_t;
+; typedef  __uint16_t    in_port_t;
+; typedef  __uint32_t  in_addr_t;
 ; struct sockaddr {
-; 	__uint8_t	sa_len;		/* total length */
-; 	sa_family_t	sa_family;	/* [XSI] address family */
-; 	char		sa_data[14];	/* [XSI] addr value (actually larger) */
+;   __uint8_t  sa_len;    /* total length */
+;   sa_family_t  sa_family;  /* [XSI] address family */
+;   char    sa_data[14];  /* [XSI] addr value (actually larger) */
 ; };
 ; struct in_addr {
-; 	in_addr_t s_addr;
+;   in_addr_t s_addr;
 ; };
 ; struct sockaddr_in {
-; 	__uint8_t	sin_len;
-; 	sa_family_t	sin_family;
-; 	in_port_t	sin_port;
-; 	struct	in_addr sin_addr;
-; 	char		sin_zero[8];
+;   __uint8_t  sin_len;
+;   sa_family_t  sin_family;
+;   in_port_t  sin_port;
+;   struct  in_addr sin_addr;
+;   char    sin_zero[8];
 ; };
 
 ; { sa_len, sa_family, sa_data }
@@ -109,17 +109,17 @@ define i8* @substr(i8* %str, i32 %offset, i32 %length) {
 ; { sin_len, sin_family, sin_port, sin_addr, sin_zero }
 %SockAddrIn = type { i8, i8, i16, %InAddr, [8 x i8] }
 
-; int	socket(int, int, int);
+; int  socket(int, int, int);
 declare i32 @socket(i32 %domain, i32 %type, i32 %protocol)
 
-; int	bind(int, const struct sockaddr *, socklen_t);
+; int  bind(int, const struct sockaddr *, socklen_t);
 ; declare i32 @bind(i32 %sockfd, %SockAddr*, i32 %len)
 declare i32 @bind(i32 %sockfd, %SockAddrIn*, i32 %len)
 
-; int	listen(int, int);
+; int  listen(int, int);
 declare i32 @listen(i32 %sockfd, i32 %backlog)
 
-; int	accept(int, struct sockaddr * __restrict, socklen_t * __restrict)
+; int  accept(int, struct sockaddr * __restrict, socklen_t * __restrict)
 declare i32 @accept(i32 %sockfd, %SockAddrIn*, i32* %len)
 
 
@@ -215,7 +215,7 @@ define void @print_new_conn() alwaysinline {
 
 %T.str.http_404 = type [49 x i8]
 @str.http_404 = constant %T.str.http_404
-  c"HTTP/1.1 400 Not Found\0D\0AContent-Length: 3\0D\0A\0D\0A404\00"
+  c"HTTP/1.1 404 Not Found\0D\0AContent-Length: 3\0D\0A\0D\0A404\00"
 
 define void @send_404(i32 %connfd) {
   %ptr = getelementptr %T.str.http_404, %T.str.http_404* @str.http_404, i32 0, i32 0
@@ -290,7 +290,7 @@ define void @on_new_connection(i32 %connfd) {
 
   ; if first 11 characters == "GET / HTTP/"
   ;   then send 200 OK with user's user-agent
-  ;   else send 400 Not Found with body "404"
+  ;   else send 404 Not Found with body "404"
 
   %given_header = call i8* @substr(i8* %buf.ptr.i8, i32 0, i32 11)
   %valid_header = getelementptr %T.str.valid_header, %T.str.valid_header*
